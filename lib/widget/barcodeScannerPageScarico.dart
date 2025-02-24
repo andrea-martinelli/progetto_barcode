@@ -100,7 +100,7 @@ class _BarcodeScannerPageScaricoState extends ConsumerState<BarcodeScannerPageSc
         widget.quantitaRichiesta,
         widget.IdOrdine,
         widget.userId,
-      );
+      ); 
 
       _showMessage('Quantità aggiornata con successo');
       setState(() {
