@@ -92,8 +92,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'Username',
+                  labelStyle: TextStyle(fontSize: 20),
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.person),
                 ),
               ),
               const SizedBox(height: 20),
@@ -102,6 +103,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  labelStyle: TextStyle(fontSize: 20),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
@@ -128,7 +130,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         )
                       : const Text(
                           'Accedi',
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 20),
                         ),
                 ),
               ),

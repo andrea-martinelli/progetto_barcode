@@ -24,7 +24,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     try {
       final productRepository = ref.read(productRepositoryProvider);
       final response = await productRepository.fetchGetStock();
-     
+
       setState(() {
         stockData = response;
         isLoading = false;
@@ -38,37 +38,69 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   List<Widget> _buildWarehouseButtons() {
-    final userId = ref.read(userIdProvider); 
+    final userId = ref.read(userIdProvider);
 
     return stockData.map((stock) {
       final warehouseId = stock['IDMagazzino'];
       final reference = stock['Nome_Magazzino'] ?? 'N/A';
-  
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: SizedBox(
-          width: double.infinity,
-          height: 200,
-          child: ElevatedButton(
-            onPressed: () {
-              ref.read(warehouseIdProvider.notifier).state = warehouseId;
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CaricaScaricaPage(
-                    warehouseId: warehouseId,
-                    userId: userId!,
-                  ),
+      return Card(
+        elevation: 6, // Aggiunge ombra alla Card
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8), // Spaziatura tra le Card
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Bordi arrotondati
+        ),
+        child: InkWell(
+          onTap: () {
+            ref.read(warehouseIdProvider.notifier).state = warehouseId;
+
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => CaricaScaricaPage(
+                  warehouseId: warehouseId,
+                  userId: userId!,
                 ),
-              );
-            },
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Icon(Icons.warehouse, color: Colors.blueGrey), // Icona magazzino
+                    const SizedBox(width: 8), // Spaziatura tra l'icona e il testo
+                    Text(
+                      '$reference',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey[800], // Colore del testo più scuro
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  '$reference',
-                  style: const TextStyle(fontSize: 24),
+                  'ID Magazzino: $warehouseId',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.blueGrey[700],
+                  ),
                 ),
               ],
             ),
@@ -137,7 +169,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: isLoading
               ? const CircularProgressIndicator()
               : errorMessage.isNotEmpty
-                  ? Text(errorMessage)
+                  ? Text(
+                      errorMessage,
+                      style: TextStyle(color: Colors.redAccent, fontSize: 16),
+                    )
                   : SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,4 +184,3 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 }
-

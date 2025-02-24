@@ -79,7 +79,9 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
                     warehouseId: widget.warehouseId,
                     IdOrdine: orderId,
                     userId: widget.userId,
-                     quantitaDiRientro: orderQuantityTotal,
+                    quantitaTotale: orderQuantityTotal,
+                    orderPosition: orderPosition,
+                    quantitaRichiesta: orderQuantityRequest,
                   ),
                 ),
               );
@@ -89,7 +91,7 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
               children: [
                 Text(
                   'ID Ordine: $orderId',
-                  style: TextStyle(
+                  style:const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white, // Colore del testo bianco
@@ -98,21 +100,21 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
                 SizedBox(height: 8),
                 Text(
                   'Nome prodotto: $orderName',
-                  style: TextStyle(
+                  style:const TextStyle(
                     fontSize: 16,
                     color: Colors.white70, // Colore del testo più chiaro
                   ),
                 ),
                 Text(
                   'Quantità Richiesta: $orderQuantityRequest',
-                  style: TextStyle(
+                  style:const TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                 ),
                 Text(
                   'Quantità Totale: $orderQuantityTotal',
-                  style: TextStyle(
+                  style:const TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
@@ -120,14 +122,14 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
                 SizedBox(height: 4),
                 Text(
                   'Barcode: $orderBarcode',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                 ),
                 Text(
                   'Posizione: $orderPosition',
-                  style: TextStyle(
+                  style:const TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),

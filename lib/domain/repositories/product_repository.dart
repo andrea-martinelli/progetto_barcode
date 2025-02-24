@@ -18,6 +18,8 @@ abstract class ProductRepository {
 
    Future<ProductInfo> getProductByBarcode(String barcode);
 
-   Future<ProductInfoUpdate> updateProductQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
+   Future<ProductInfoUpdate> updateProductCaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
+
+   Future<ProductInfoUpdate> updateProductScaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
     
 }

@@ -15,61 +15,95 @@ class CaricaScaricaPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Carica o Scarica'), // Titolo della pagina
+        title: const Text('Carica o Scarica'),
+        centerTitle: true, // Centra il titolo dell'AppBar
+        backgroundColor: Colors.teal, // Cambia il colore dell'AppBar
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0), // Margini intorno ai bottoni
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.teal, Colors.greenAccent],
+          ),
+        ),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Bottone "Carica"
-            SizedBox(
-              width: double.infinity, // Larghezza piena del bottone
-              height: 300, // Altezza del bottone
-              child: ElevatedButton(
-                onPressed: () {
-                  // Naviga a OrdersPage passando il warehouseId e l'azione "carica"
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OrdiniCaricoPage(
-                        warehouseId: warehouseId,
-                        userId: userId ?? 0,
-                     ),
+            _buildCustomButton(
+              context,
+              label: 'Carica',
+              icon: Icons.file_upload_outlined,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrdiniCaricoPage(
+                      warehouseId: warehouseId,
+                      userId: userId ?? 0,
                     ),
-                  );
-                },
-                child: const Text(
-                  'Carica',
-                  style: TextStyle(fontSize: 24), // Testo grande
-                ),
-              ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 30), // Spazio tra i bottoni
+
             // Bottone "Scarica"
-            SizedBox(
-              width: double.infinity, // Larghezza piena del bottone
-              height: 300, // Altezza del bottone
-              child: ElevatedButton(
-                onPressed: () {
-                  // Naviga a OrdersPage passando il warehouseId e l'azione "scarica"
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OrdiniScaricoPage(
-                        warehouseId: warehouseId,
-                        userId: userId ?? 0,
-                      ),
+            _buildCustomButton(
+              context,
+              label: 'Scarica',
+              icon: Icons.file_download_outlined,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrdiniScaricoPage(
+                      warehouseId: warehouseId,
+                      userId: userId ?? 0,
                     ),
-                  );
-                },
-                child: const Text(
-                  'Scarica',
-                  style: TextStyle(fontSize: 24), // Testo grande
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Funzione helper per costruire un pulsante personalizzato
+  Widget _buildCustomButton(BuildContext context,
+      {required String label, required IconData icon, required VoidCallback onPressed}) {
+    return SizedBox(
+      width: double.infinity, // Larghezza piena
+      height: 80, // Altezza del bottone
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15), // Arrotondamento dei bordi
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 20), // Padding interno
+          backgroundColor: Colors.white, // Colore di sfondo del pulsante
+          shadowColor: Colors.black.withOpacity(0.2), // Colore dell'ombra
+          elevation: 8, // Altezza dell'ombra
+        ),
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          size: 40,
+          color: Colors.teal, // Colore dell'icona
+        ),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 24, // Dimensione del testo
+            color: Colors.teal, // Colore del testo
+          ),
         ),
       ),
     );

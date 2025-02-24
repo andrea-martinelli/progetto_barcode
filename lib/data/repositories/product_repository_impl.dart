@@ -63,11 +63,20 @@ class ProductRepositoryImpl implements ProductRepository {
 }  
 
  @override
-  Future<ProductInfoUpdate> updateProductQuantityOnServer(  String barcode, int userId, int newQuantity, int IDOrdine) 
+  Future<ProductInfoUpdate> updateProductCaricoQuantityOnServer(  String barcode, int userId, int newQuantity, int IDOrdine) 
   async {
     // Chiama il metodo di ApiClient per aggiornare la quantità del prodotto
-    await apiClient.updateProductQuantityOnServer(barcode, userId, newQuantity, IDOrdine);
+    await apiClient.updateProductCaricoQuantityOnServer(barcode, userId, newQuantity, IDOrdine);
     return ProductInfoUpdate(barcode: barcode, userId: userId, newQuantity: newQuantity, IDOrdine: IDOrdine);
   }
 
+
+
+ @override
+  Future<ProductInfoUpdate> updateProductScaricoQuantityOnServer(  String barcode, int userId, int newQuantity, int IDOrdine) 
+  async {
+    // Chiama il metodo di ApiClient per aggiornare la quantità del prodotto
+    await apiClient.updateProductScaricoQuantityOnServer(barcode, userId, newQuantity, IDOrdine);
+    return ProductInfoUpdate(barcode: barcode, userId: userId, newQuantity: newQuantity, IDOrdine: IDOrdine);
+  }
 }

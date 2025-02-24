@@ -1,20 +1,19 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:progetto_barcode/data/models/product_info.dart';
 import 'package:progetto_barcode/providers.dart';
-import 'package:progetto_barcode/data/repositories/product_repository_impl.dart';
-import 'package:progetto_barcode/data/datasources/api_client.dart';
-import 'package:progetto_barcode/domain/repositories/product_repository.dart';
+import 'package:progetto_barcode/widget/caricaScaricaPage.dart';
 
 class BarcodeScannerPageScarico extends ConsumerStatefulWidget {
-  const BarcodeScannerPageScarico({super.key, required this.IdOrdine, required this.userId, required this.warehouseId, required this.quantitaDiRientro, });
+  const BarcodeScannerPageScarico({super.key, required this.IdOrdine, required this.userId, required this.warehouseId, required this.quantitaTotale, required this.orderPosition, required this.quantitaRichiesta});
   
   final int IdOrdine;
   final int userId;
   final int warehouseId;
-  final int quantitaDiRientro;
+  final int quantitaTotale;
+  final String orderPosition;
+  final int quantitaRichiesta;
   @override
   _BarcodeScannerPageScaricoState createState() => _BarcodeScannerPageScaricoState();
 }
@@ -96,9 +95,9 @@ class _BarcodeScannerPageScaricoState extends ConsumerState<BarcodeScannerPageSc
     try {
       // int quantityChange = int.tryParse(_quantityController.text) ?? 0;
 
-      await productRepository.updateProductQuantityOnServer(
+      await productRepository.updateProductScaricoQuantityOnServer(
         scannedBarcode!,
-        widget.quantitaDiRientro,
+        widget.quantitaRichiesta,
         widget.IdOrdine,
         widget.userId,
       );
@@ -130,16 +129,19 @@ class _BarcodeScannerPageScaricoState extends ConsumerState<BarcodeScannerPageSc
       children: [
         if (productInfo != null) ...[
           Text('Nome prodotto: ${productInfo!.Nome}',
-              style: const TextStyle(fontSize: 26)),
+              style: const TextStyle(fontSize: 22)),
           Text('Quantità attuale: $totalQuantity',
-              style: const TextStyle(fontSize: 30)),
-          Text('Quantità di scarico: ${widget.quantitaDiRientro}',
-              style: const TextStyle(fontSize: 26)),
+              style: const TextStyle(fontSize: 24)),
+          Text('Quantità da scaricare: ${widget.quantitaRichiesta}',
+              style: const TextStyle(fontSize: 24)),
+           Text('Posizione: ${widget.orderPosition}',
+          style: const TextStyle(fontSize: 24)),
+
           const SizedBox(height: 40),
           _buildQuantityInput(),
           const SizedBox(height: 20),
-          _buildQuantityButtons(),
-          const SizedBox(height: 30),
+          // _buildQuantityButtons(),
+          // const SizedBox(height: 30),
           SizedBox(
             width: 180,
             height: 100,
@@ -158,6 +160,16 @@ class _BarcodeScannerPageScaricoState extends ConsumerState<BarcodeScannerPageSc
                   scannedBarcode = null;
                   productInfo = null;
                 });
+                     // Poi naviga alla pagina CaricaScaricaPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CaricaScaricaPage(
+            warehouseId: widget.warehouseId,
+            userId: widget.userId,
+          ),
+        ),
+      );
               },
               child: const Text('Scansiona un altro prodotto', style: TextStyle(fontSize: 20)),
             ),
@@ -183,37 +195,37 @@ class _BarcodeScannerPageScaricoState extends ConsumerState<BarcodeScannerPageSc
     );
   }
 
-  Widget _buildQuantityButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildIncrementButton('-', () {
-          setState(() {
-            int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-            _quantityController.text = (currentQuantity - 1).toString();
-          });
-        }),
-        const SizedBox(width: 30),
-        _buildIncrementButton('+', () {
-          setState(() {
-            int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-            _quantityController.text = (currentQuantity + 1).toString();
-          });
-        }),
-      ],
-    );
-  }
+  //Widget _buildQuantityButtons() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       _buildIncrementButton('-', () {
+  //         setState(() {
+  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
+  //           _quantityController.text = (currentQuantity - 1).toString();
+  //         });
+  //       }),
+  //       const SizedBox(width: 30),
+  //       _buildIncrementButton('+', () {
+  //         setState(() {
+  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
+  //           _quantityController.text = (currentQuantity + 1).toString();
+  //         });
+  //       }),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildIncrementButton(String label, VoidCallback onPressed) {
-    return SizedBox(
-      width: 120,
-      height: 80,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(label, style: const TextStyle(fontSize: 36)),
-      ),
-    );
-  }
+  // Widget _buildIncrementButton(String label, VoidCallback onPressed) {
+  //   return SizedBox(
+  //     width: 120,
+  //     height: 80,
+  //     child: ElevatedButton(
+  //       onPressed: onPressed,
+  //       child: Text(label, style: const TextStyle(fontSize: 36)),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

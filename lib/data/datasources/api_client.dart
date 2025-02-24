@@ -12,7 +12,7 @@ class ApiClient {
 
      // Metodo di login (chiamata reale)
 Future<Map<String, dynamic>> login(String username, String password) async {
-    final url = 'https://c544-151-53-251-220.ngrok-free.app/api/Login/login';
+    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Login/login';
    // 'http://10.11.11.157:5158/api/Login/login;' // L'endpoint reale
 
     try {
@@ -58,7 +58,7 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 
 
      Future<List<Map<String, dynamic>>> fetchGetStock() async {
-    final url = 'https://c544-151-53-251-220.ngrok-free.app/api/Magazzino/GetMagazzino';
+    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Magazzino/GetMagazzino';
     //'http://10.11.11.157:5158/api/Magazzino/GetMagazzino';
 
     try {
@@ -75,7 +75,7 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 
    Future<List<Map<String, dynamic>>> fetchOrdiniCarica(int idMagazzino, int userId) async {
 
-       final url = 'https://c544-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId'; 
+       final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId'; 
       // 'http://10.11.11.157:5158/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
 
       try {
@@ -103,7 +103,7 @@ Future<Map<String, dynamic>> login(String username, String password) async {
   }
 
   Future<List<Map<String, dynamic>>> fetchOrdiniScarica(int IdMagazzino, int userId) async {
-    final url = 'https://c544-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$idMagazzino&userId=$userId';
+    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
     //'http://10.11.11.157:5158/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
    
     try {
@@ -149,7 +149,7 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 
 
   Future<Map<String, dynamic>> getProductByBarcode(String barcode) async {
-  final url = 'https://c544-151-53-251-220.ngrok-free.app/api/Barcode/$barcode';
+  final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Barcode/$barcode';
    //'http://10.11.11.157:5158/api/Barcode/$barcode';
 
   try {
@@ -168,13 +168,13 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 
   
 
-// Metodo per aggiornare la quantità del prodotto sul server
- Future<void> updateProductQuantityOnServer(
+// Metodo per aggiornare(carico) la quantità del prodotto sul server
+ Future<void> updateProductCaricoQuantityOnServer(
   String barcode, int newQuantity, int IDOrdine,int UserID) async {
   
   // URL pulito
-  final url = //'http://10.11.11.157:5158/api/Barcode/$barcode/$newQuantity/$IDOrdine/$UserID';
-  'https://c544-151-53-251-220.ngrok-free.app/api/Barcode/$barcode/$newQuantity/$IDOrdine/$UserID';
+  final url = //'http://10.11.11.157:5158/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  'https://c544-151-53-251-220.ngrok-free.app/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
   
   try {
     print('Invio richiesta PUT a $url con i seguenti parametri:');
@@ -208,6 +208,46 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 }
 
  
+
+
+// Metodo per aggiornare(carico) la quantità del prodotto sul server
+ Future<void> updateProductScaricoQuantityOnServer(
+  String barcode, int newQuantity, int IDOrdine,int UserID) async {
+  
+  // URL pulito
+  final url = //'http://10.11.11.157:5158/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  'https://bc7a-151-53-251-220.ngrok-free.app/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  
+  try {
+    print('Invio richiesta PUT a $url con i seguenti parametri:');
+    print('Barcode: $barcode, userId: $userId, newQuantity: $newQuantity, IDOrdine: $IDOrdine');
+    
+    // Invia i dati nel corpo della richiesta
+    final response = await dio.put(
+      url,
+      data: {
+        'barcode': barcode,
+        'newQuantity': newQuantity,
+        'IDOrdine': IDOrdine,
+        'UserID': UserID,
+      },
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json', // Specifica che i dati sono in formato JSON
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      print('Quantità aggiornata con successo.');
+    } else {
+      throw Exception('Errore nella risposta del server: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Errore nella richiesta PUT: $e');
+    throw Exception('Errore nella richiesta PUT: $e');
+  }
+}
 
   
 }

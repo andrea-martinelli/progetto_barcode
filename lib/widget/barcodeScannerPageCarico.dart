@@ -7,6 +7,7 @@ import 'package:progetto_barcode/providers.dart';
 import 'package:progetto_barcode/data/repositories/product_repository_impl.dart';
 import 'package:progetto_barcode/data/datasources/api_client.dart';
 import 'package:progetto_barcode/domain/repositories/product_repository.dart';
+import 'package:progetto_barcode/widget/caricaScaricaPage.dart';
 
 class BarcodeScannerPageCarico extends ConsumerStatefulWidget {
   const BarcodeScannerPageCarico({super.key, required this.IdOrdine, required this.userId, required this.warehouseId, required this.quantitaDiRientro, required this.orderPosition});
@@ -97,7 +98,7 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
     try {
       // int quantityChange = int.tryParse(_quantityController.text) ?? 0;
 
-      await productRepository.updateProductQuantityOnServer(
+      await productRepository.updateProductCaricoQuantityOnServer(
         scannedBarcode!,
         widget.quantitaDiRientro,
         widget.IdOrdine,
@@ -135,7 +136,7 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
         if (productInfo != null) ...[
           
           Text('Nome prodotto: ${productInfo!.Nome}',
-              style: const TextStyle(fontSize: 24)),
+              style: const TextStyle(fontSize: 20)),
           Text('Quantità attuale: $totalQuantity',
               style: const TextStyle(fontSize: 24)),
           Text('Quantità da aggiungere: ${widget.quantitaDiRientro}',
@@ -146,8 +147,8 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
           const SizedBox(height: 40),
           _buildQuantityInput(),
           const SizedBox(height: 20),
-          _buildQuantityButtons(),
-          const SizedBox(height: 30),
+          // _buildQuantityButtons(),
+          // const SizedBox(height: 30),
           SizedBox(
             width: 180,
             height: 100,
@@ -165,9 +166,23 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
                 setState(() {
                   scannedBarcode = null;
                   productInfo = null;
+                  
                 });
-              },
-              child: const Text('Scansiona un altro prodotto', style: TextStyle(fontSize: 20)),
+                   // Poi naviga alla pagina CaricaScaricaPage
+     // Poi naviga alla pagina CaricaScaricaPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CaricaScaricaPage(
+            warehouseId: widget.warehouseId,
+            userId: widget.userId,
+          ),
+        ),
+      );
+    },
+              child: const Text(
+                'Scansiona un altro prodotto', style: TextStyle(fontSize: 20)),
+             
             ),
           ),
         ],
@@ -191,26 +206,26 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
     );
   }
 
-  Widget _buildQuantityButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildIncrementButton('-', () {
-          setState(() {
-            int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-            _quantityController.text = (currentQuantity - 1).toString();
-          });
-        }),
-        const SizedBox(width: 30),
-        _buildIncrementButton('+', () {
-          setState(() {
-            int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-            _quantityController.text = (currentQuantity + 1).toString();
-          });
-        }),
-      ],
-    );
-  }
+  // Widget _buildQuantityButtons() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       _buildIncrementButton('-', () {
+  //         setState(() {
+  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
+  //           _quantityController.text = (currentQuantity - 1).toString();
+  //         });
+  //       }),
+  //       const SizedBox(width: 30),
+  //       _buildIncrementButton('+', () {
+  //         setState(() {
+  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
+  //           _quantityController.text = (currentQuantity + 1).toString();
+  //         });
+  //       }),
+  //     ],
+  //   );
+  // }
 
   Widget _buildIncrementButton(String label, VoidCallback onPressed) {
     return SizedBox(
