@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:progetto_barcode/providers.dart';
 import 'package:progetto_barcode/widget/OrdiniCaricoPage.dart'; // Assicurati di importare OrdersPage
 import 'package:progetto_barcode/widget/OrdiniScaricoPage.dart';
 
 class CaricaScaricaPage extends ConsumerWidget {
   final int warehouseId; // ID del magazzino
 
-  CaricaScaricaPage({required this.warehouseId});
+  CaricaScaricaPage({required this.warehouseId, required int userId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.read(userIdProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Carica o Scarica'), // Titolo della pagina
@@ -31,6 +34,7 @@ class CaricaScaricaPage extends ConsumerWidget {
                     MaterialPageRoute(
                       builder: (context) => OrdiniCaricoPage(
                         warehouseId: warehouseId,
+                        userId: userId ?? 0,
                      ),
                     ),
                   );
@@ -54,6 +58,7 @@ class CaricaScaricaPage extends ConsumerWidget {
                     MaterialPageRoute(
                       builder: (context) => OrdiniScaricoPage(
                         warehouseId: warehouseId,
+                        userId: userId ?? 0,
                       ),
                     ),
                   );

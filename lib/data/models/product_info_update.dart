@@ -1,40 +1,47 @@
 class ProductInfoUpdate {
   final String barcode;
-  final int qty;
-  final int warehouseId;
+  final int userId;
+  final int newQuantity;
+  final int IDOrdine;
   
   ProductInfoUpdate({
     required this.barcode,
-    required this.qty,  
-    required this.warehouseId,
+    required this.userId,  
+    required this.newQuantity,
+    required this.IDOrdine,
    });
     
     ProductInfoUpdate copyWith({
     String? barcode,
-    int? qty,
-    int? warehouseId,
+    int? userId,
+    int? newQuantity,
+    int? IDOrdine,
      })
       {
 
-    return ProductInfoUpdate(
+  return ProductInfoUpdate(
     barcode: barcode ?? this.barcode,
-      qty: qty ?? this.qty,
-     warehouseId: warehouseId ?? this.warehouseId,
+    userId: userId ?? this.userId,
+    newQuantity: newQuantity ?? this.newQuantity, 
+    IDOrdine: IDOrdine ?? this.IDOrdine,
      );
   }
 
  factory ProductInfoUpdate.fromJson(Map<String, dynamic> json) {
     return ProductInfoUpdate(
       barcode: json['barcode'] ?? '',
-      qty: json['qty'] ?? 0,
-      warehouseId: json['warehouseId'],
+      userId: json['userId'] ?? 0,
+      newQuantity: json['newQuantity'] ?? 0,
+      IDOrdine: json['IDOrdine'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
        'barcode': barcode,
-      'qty': qty,
+       'userId': userId,
+       'newQuantity': newQuantity,
+       'IDOrdine': IDOrdine,
       
     };
   }

@@ -14,9 +14,11 @@ import 'package:progetto_barcode/data/repositories/product_repository_impl.dart'
 
 // Define a StateProvider for storing the warehouseId
 final warehouseIdProvider = StateProvider<int>((ref)=> 0);
+
+final userIdProvider = StateProvider<int?>((ref) => null);
 //
 // Define a StateProvider for storing the reference
-final warehousereferenceProvider = StateProvider<String?>((ref) => null);
+//final warehousereferenceProvider = StateProvider<String?>((ref) => null);
 // 
 
 

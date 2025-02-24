@@ -40,6 +40,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
       // Gestisci il successo del login
       if (response['success'] == true) {
+        final userId = response['userId'];
+
+         // Memorizza userId nel provider
+      ref.read(userIdProvider.notifier).state = userId;
+
+
         // Naviga alla HomePage se il login ha successo
         Navigator.pushReplacement(
           context,
@@ -48,13 +54,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       } else {
         // Mostra un messaggio di errore se il login fallisce
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Login fallito, riprova')),
+          SnackBar(content: Text(response['message'] )),
         );
       }
     } catch (e) {
       // Mostra un messaggio di errore in caso di eccezione
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante il login: $e')),
+        SnackBar(content: Text('Errore durante il login, riprova')),
       );
     } finally {
       // Rimuovi lo stato di caricamento
@@ -76,10 +82,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 60),
-              CircleAvatar(
-                radius: 60,
-                backgroundImage: AssetImage(''), // Percorso dell'immagine
-              ),
+              // CircleAvatar(
+              //   radius: 60,
+              //   backgroundImage: AssetImage(''), // Percorso dell'immagine
+              // ),
               const SizedBox(height: 40),
               TextField(
                 controller: _emailController,

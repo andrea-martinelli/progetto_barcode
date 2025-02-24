@@ -30,19 +30,19 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> fetchGetStock(int IDMagazzino, String Nome_Magazzino) async {
+  Future<List<Map<String, dynamic>>> fetchGetStock() async {
     // Chiama il metodo di ApiClient per ottenere la disponibilità del magazzino
-    final stockname = await apiClient.fetchGetStock(IDMagazzino, Nome_Magazzino);
+    final stockname = await apiClient.fetchGetStock();
     return stockname;
   }
 
-  Future<List<Map<String, dynamic>>> fetchOrdiniCarica(int IDOrdine, String Nome_Materiale, int Quantita_Richiesta, String Posizione) async {
-    final carica = await apiClient.fetchOrdiniCarica(IDOrdine, Nome_Materiale, Quantita_Richiesta, Posizione);
+  Future<List<Map<String, dynamic>>> fetchOrdiniCarica(int IdMagazzino, int userId) async {
+    final carica = await apiClient.fetchOrdiniCarica(IdMagazzino, userId);
     return carica;
   }
 
-  Future<List<Map<String, dynamic>>> fetchOrdiniScarica(int IDOrdine, String Nome_Materiale, int Quantita_Richiesta, String Posizione) async{
-    final scarica = await  apiClient.fetchOrdiniScarica(IDOrdine, Nome_Materiale, Quantita_Richiesta, Posizione);
+  Future<List<Map<String, dynamic>>> fetchOrdiniScarica(int IdMagazzino, int userId) async{
+    final scarica = await  apiClient.fetchOrdiniScarica(IdMagazzino, userId);
     return scarica;
   }
  
@@ -63,11 +63,11 @@ class ProductRepositoryImpl implements ProductRepository {
 }  
 
  @override
-  Future<ProductInfoUpdate> updateProductQuantityOnServer( String barcode, int qty, int warehouseId) 
+  Future<ProductInfoUpdate> updateProductQuantityOnServer(  String barcode, int userId, int newQuantity, int IDOrdine) 
   async {
     // Chiama il metodo di ApiClient per aggiornare la quantità del prodotto
-    await apiClient.updateProductQuantityOnServer(barcode, qty, warehouseId);
-    return ProductInfoUpdate(barcode: barcode, qty: qty, warehouseId: warehouseId);
+    await apiClient.updateProductQuantityOnServer(barcode, userId, newQuantity, IDOrdine);
+    return ProductInfoUpdate(barcode: barcode, userId: userId, newQuantity: newQuantity, IDOrdine: IDOrdine);
   }
 
 }
