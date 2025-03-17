@@ -77,8 +77,8 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
                 MaterialPageRoute(
                   builder: (context) => BarcodeScannerPageScarico(
                     warehouseId: widget.warehouseId,
-                    IdOrdine: orderId,
                     userId: widget.userId,
+                    IdOrdine: orderId,
                     quantitaTotale: orderQuantityTotal,
                     orderPosition: orderPosition,
                     quantitaRichiesta: orderQuantityRequest,

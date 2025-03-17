@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:progetto_barcode/domain/repositories/product_repository.dart';
 import 'package:progetto_barcode/widget/homePage.dart'; // Importa la tua HomePage
 import 'package:progetto_barcode/providers.dart'; // Importa il provider del repository
 
@@ -23,6 +22,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
+    // Verifica se i campi di testo contengono valori
+  print('Username inserito: ${_emailController.text}');
+  print('Password inserita: ${_passwordController.text}');
+
     // Imposta lo stato su "caricamento" per mostrare un indicatore
     setState(() {
       _isLoading = true;
@@ -35,13 +38,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final username = _emailController.text;
       final password = _passwordController.text;
 
+     
+    // Aggiungi print prima di inviare la richiesta per vedere cosa viene passato
+    print('Tentativo di login con Username: $username, Password: $password');
+
+
       // Chiama la funzione di login
       final response = await ProductRepository.login(username, password);
-
+      print('Risposta completa del server: $response');
+      
+       
       // Gestisci il successo del login
       if (response['success'] == true) {
         final userId = response['userId'];
-
          // Memorizza userId nel provider
       ref.read(userIdProvider.notifier).state = userId;
 
@@ -60,7 +69,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } catch (e) {
       // Mostra un messaggio di errore in caso di eccezione
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante il login, riprova')),
+        SnackBar(content: Text('Errore durante il login: $e')),
       );
     } finally {
       // Rimuovi lo stato di caricamento
@@ -93,6 +102,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 decoration: const InputDecoration(
                   labelText: 'Username',
                   labelStyle: TextStyle(fontSize: 20),
+                  
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),

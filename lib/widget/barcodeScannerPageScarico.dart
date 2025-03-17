@@ -14,6 +14,7 @@ class BarcodeScannerPageScarico extends ConsumerStatefulWidget {
   final int quantitaTotale;
   final String orderPosition;
   final int quantitaRichiesta;
+  
   @override
   _BarcodeScannerPageScaricoState createState() => _BarcodeScannerPageScaricoState();
 }

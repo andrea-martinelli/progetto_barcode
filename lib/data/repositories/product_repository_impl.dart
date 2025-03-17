@@ -46,16 +46,12 @@ class ProductRepositoryImpl implements ProductRepository {
     return scarica;
   }
  
+ Future<List<Map<String, dynamic>>> fetchMateriali(int IdMagazzino, int userId) async {
+  final materiali = await apiClient.fetchMateriali(IdMagazzino, userId);
+    return materiali;
+  }
 
-//    // Implementazione del metodo per ottenere gli ordini di un magazzino
-//   @override
-//   Future<List<Map<String, dynamic>>> fetchOrdersByWarehouse(int warehouseId) async {
-//     final orders = await apiClient.fetchOrdersByWarehouse(warehouseId);
-//     return orders;
-// }
-
-
- @override
+  @override
  Future<ProductInfo> getProductByBarcode(String barcode) async {
   final productData = await apiClient.getProductByBarcode( barcode,);
   print('Product data received: $productData'); // Aggiungi questo per debug
@@ -79,4 +75,19 @@ class ProductRepositoryImpl implements ProductRepository {
     await apiClient.updateProductScaricoQuantityOnServer(barcode, userId, newQuantity, IDOrdine);
     return ProductInfoUpdate(barcode: barcode, userId: userId, newQuantity: newQuantity, IDOrdine: IDOrdine);
   }
-}
+
+  Future<void> updateMaterialQuantityOnServer(String barcode,int newQuantity, int MaterialId, int UserId)async {
+    await apiClient.updateMaterialQuantityOnServer(barcode, newQuantity, MaterialId, UserId);
+  
+  }
+ }
+
+//    // Implementazione del metodo per ottenere gli ordini di un magazzino
+//   @override
+//   Future<List<Map<String, dynamic>>> fetchOrdersByWarehouse(int warehouseId) async {
+//     final orders = await apiClient.fetchOrdersByWarehouse(warehouseId);
+//     return orders;
+// }
+
+
+ 

@@ -11,10 +11,13 @@ class ApiClient {
 
 
      // Metodo di login (chiamata reale)
-Future<Map<String, dynamic>> login(String username, String password) async {
-    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Login/login';
-   // 'http://10.11.11.157:5158/api/Login/login;' // L'endpoint reale
-
+  Future<Map<String, dynamic>> login(String username, String password) async {
+    final url =  'http://192.168.1.99:5158/api/Login/login';
+    
+    //'https://92e3-151-50-131-245.ngrok-free.app/api/Login/login';
+  //  'http://localhost:5158/api/Login/login'; // L'endpoint reale
+  
+    
     try {
       final response = await dio.post(
         url,
@@ -47,25 +50,45 @@ Future<Map<String, dynamic>> login(String username, String password) async {
         'success': false,
         'message': e.response?.data['message'],
       };
-    // } catch (e) {
-    //   // Gestione di altri tipi di errori
-    //   return {
-    //     'success': false,
-    //     'message': 'Errore durante il login: $e',
-    //   };
     }
   }
 
 
      Future<List<Map<String, dynamic>>> fetchGetStock() async {
-    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Magazzino/GetMagazzino';
-    //'http://10.11.11.157:5158/api/Magazzino/GetMagazzino';
+    final url = //'https://92e3-151-50-131-245.ngrok-free.app/api/Magazzino/GetMagazzino';
+   // 'http://localhost:5158/api/Magazzino/GetMagazzino';
+
+    'http://192.168.1.99:5158/api/Magazzino/GetMagazzino';
 
     try {
       final response = await dio.get(
         url,
-        options: Options()
+        options: Options( 
+          headers: {
+          'Content-Type': 'application/json',
+        },
+        ),
       );
+
+        // Stampa la risposta per vedere i dati ricevuti
+    print('Codice di stato: ${response.statusCode}');
+
+     print('Tipo di dati della risposta: ${response.data.runtimeType}');
+
+       // Stampa la risposta per vedere cosa viene restituito
+    print('Risposta API: ${response.data}');
+  
+
+  // alternativa per stampare la risposta
+  //   if (response.data is List) {
+  //     return List<Map<String, dynamic>>.from(response.data);
+  //   } else {
+  //     throw Exception('La risposta non è una lista di oggetti JSON');
+  //   }
+  // } catch (e) {
+  //   print('Errore durante la chiamata API: $e');
+  //   throw Exception('Errore nella richiesta API: $e');
+  // }
       return List<Map<String, dynamic>>.from(response.data);
     } catch (e) {
       throw Exception('Errore nella richiesta API: $e');
@@ -75,8 +98,8 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 
    Future<List<Map<String, dynamic>>> fetchOrdiniCarica(int idMagazzino, int userId) async {
 
-       final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId'; 
-      // 'http://10.11.11.157:5158/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
+     final url = //'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId'; 
+      'http://192.168.1.99:5158/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
 
       try {
       final response = await dio.get(   
@@ -91,7 +114,7 @@ Future<Map<String, dynamic>> login(String username, String password) async {
       final errorData = response.data;
       if (errorData is Map<String, dynamic> && errorData.containsKey('message')) {
         // Se il messaggio di errore è presente nella risposta del server
-        throw Exception('Errore dal server: ${errorData['message']}');
+        throw Exception('Errore dal server: ${['message']}');
       } else {
         throw Exception('Errore nella risposta: codice ${response.statusCode}');
       }
@@ -103,8 +126,8 @@ Future<Map<String, dynamic>> login(String username, String password) async {
   }
 
   Future<List<Map<String, dynamic>>> fetchOrdiniScarica(int IdMagazzino, int userId) async {
-    final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
-    //'http://10.11.11.157:5158/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
+    final url = //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
+    'http://192.168.1.99:5158/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
    
     try {
       final response = await dio.get(
@@ -129,28 +152,39 @@ Future<Map<String, dynamic>> login(String username, String password) async {
     throw Exception('Errore nella richiesta API: $e');
   }
   }
-  // Future<List<Map<String, dynamic>>> fetchOrdersByWarehouse(int warehouseId) async {
-  //   final String url = 'https://api.example.com/orders'; // Cambia con il tuo URL reale
 
-  //   try {
-  //     final response = await dio.get(
-  //       url,
-  //       queryParameters: {
-  //         'warehouseId': warehouseId, // Passa l'ID del magazzino come parametro
-  //       },
-  //     );
 
-  //     // Assumi che la risposta dell'API sia una lista di ordini in formato JSON
-  //     return List<Map<String, dynamic>>.from(response.data);
-  //   } catch (e) {
-  //     throw Exception('Errore nella richiesta API: $e');
-  //   }
-  //}
+  Future<List<Map<String, dynamic>>> fetchMateriali(int IdMagazzino, int userId) async {
+    final url ='http://192.168.1.99:5158/api/Materiali/GetMateriali?idMagazzino=$IdMagazzino&userId=$userId';
+   
+    try {
+      final response = await dio.get(
+        url,
+        options: Options()
+      );
+     if (response.statusCode == 200) {
+      // Se la risposta è OK (200), restituiamo i dati
+      return List<Map<String, dynamic>>.from(response.data);
+    } else {
+      // Se non è 200, gestiamo l'errore
+      final errorData = response.data;
+      
+      if (errorData is Map<String, dynamic> && errorData.containsKey('message')) {
+        // Se il messaggio di errore è presente nella risposta del server
+        throw Exception('Errore dal server: ${errorData['message']}');
+      } else {
+        throw Exception('Errore nella risposta: codice ${response.statusCode}');
+      }
+    }
+  } catch (e) {
+    throw Exception('Errore nella richiesta API: $e');
+  }
+  }
 
 
   Future<Map<String, dynamic>> getProductByBarcode(String barcode) async {
-  final url = 'https://bc7a-151-53-251-220.ngrok-free.app/api/Barcode/$barcode';
-   //'http://10.11.11.157:5158/api/Barcode/$barcode';
+  final url = //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
+   'http://192.168.1.99:5158/api/Barcode/$barcode';
 
   try {
     print('Invio richiesta a: $url'); // Log dell'URL
@@ -173,8 +207,8 @@ Future<Map<String, dynamic>> login(String username, String password) async {
   String barcode, int newQuantity, int IDOrdine,int UserID) async {
   
   // URL pulito
-  final url = //'http://10.11.11.157:5158/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
-  'https://c544-151-53-251-220.ngrok-free.app/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  final url = 'http://192.168.1.99:5158/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
+ // 'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
   
   try {
     print('Invio richiesta PUT a $url con i seguenti parametri:');
@@ -207,7 +241,10 @@ Future<Map<String, dynamic>> login(String username, String password) async {
   }
 }
 
- 
+ Future<void> updateMaterialQuantityOnServer(String barcode,int newQuantity, int MaterialId, int UserId) async {
+  final url = 'http://192.168.1.99:5158/api/Materiali/Scarico/$barcode/$newQuantity/$MaterialId/$UserId';
+  
+ }
 
 
 // Metodo per aggiornare(carico) la quantità del prodotto sul server
@@ -215,8 +252,8 @@ Future<Map<String, dynamic>> login(String username, String password) async {
   String barcode, int newQuantity, int IDOrdine,int UserID) async {
   
   // URL pulito
-  final url = //'http://10.11.11.157:5158/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
-  'https://bc7a-151-53-251-220.ngrok-free.app/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  final url = 'http://192.168.1.99:5158/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
+  //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
   
   try {
     print('Invio richiesta PUT a $url con i seguenti parametri:');

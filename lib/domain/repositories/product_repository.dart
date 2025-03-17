@@ -13,13 +13,16 @@ abstract class ProductRepository {
 
     Future<List<Map<String, dynamic>>> fetchOrdiniScarica(int IdMagazzino, int userId);
  
-  // Nuova funzione per ottenere gli ordini di un magazzino
- // Future<List<Map<String, dynamic>>> fetchOrdersByWarehouse(int warehouseId);
+    Future<List<Map<String, dynamic>>> fetchMateriali(int IdMagazzino, int userId);
 
-   Future<ProductInfo> getProductByBarcode(String barcode);
+    Future<ProductInfo> getProductByBarcode(String barcode);
 
-   Future<ProductInfoUpdate> updateProductCaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
+    Future<ProductInfoUpdate> updateProductCaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
 
-   Future<ProductInfoUpdate> updateProductScaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
+    Future<ProductInfoUpdate> updateProductScaricoQuantityOnServer( String barcode, int userId, int newQuantity, int IDOrdine); // Aggiungi questo metodo
+
+    Future<void> updateMaterialQuantityOnServer(String barcode,int newQuantity, int MaterialId, int UserId);
+
+    
     
 }

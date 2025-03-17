@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:progetto_barcode/providers.dart';
 import 'package:progetto_barcode/widget/OrdiniCaricoPage.dart'; // Assicurati di importare OrdersPage
 import 'package:progetto_barcode/widget/OrdiniScaricoPage.dart';
+import 'package:progetto_barcode/widget/MaterialiPage.dart';
 
 class CaricaScaricaPage extends ConsumerWidget {
   final int warehouseId; // ID del magazzino
@@ -15,7 +16,7 @@ class CaricaScaricaPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Carica o Scarica'),
+        title: const Text('Tipologia di ordine'),
         centerTitle: true, // Centra il titolo dell'AppBar
         backgroundColor: Colors.teal, // Cambia il colore dell'AppBar
       ),
@@ -37,7 +38,7 @@ class CaricaScaricaPage extends ConsumerWidget {
             // Bottone "Carica"
             _buildCustomButton(
               context,
-              label: 'Carica',
+              label: 'Carico',
               icon: Icons.file_upload_outlined,
               onPressed: () {
                 Navigator.push(
@@ -56,13 +57,32 @@ class CaricaScaricaPage extends ConsumerWidget {
             // Bottone "Scarica"
             _buildCustomButton(
               context,
-              label: 'Scarica',
+              label: 'Scarico',
               icon: Icons.file_download_outlined,
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => OrdiniScaricoPage(
+                      warehouseId: warehouseId,
+                      userId: userId ?? 0,
+                    ),
+                  ),
+                );
+              },
+            ),
+            
+            const SizedBox(height: 30), // Spazio tra i bottoni
+            
+            _buildCustomButton(
+              context,
+              label: 'Materiali',
+              icon: Icons.inventory_outlined,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MaterialiPage(
                       warehouseId: warehouseId,
                       userId: userId ?? 0,
                     ),
@@ -81,7 +101,7 @@ class CaricaScaricaPage extends ConsumerWidget {
       {required String label, required IconData icon, required VoidCallback onPressed}) {
     return SizedBox(
       width: double.infinity, // Larghezza piena
-      height: 80, // Altezza del bottone
+      height: 100, // Altezza del bottone
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(

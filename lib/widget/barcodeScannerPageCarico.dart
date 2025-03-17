@@ -1,27 +1,35 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:progetto_barcode/data/models/product_info.dart';
 import 'package:progetto_barcode/providers.dart';
-import 'package:progetto_barcode/data/repositories/product_repository_impl.dart';
-import 'package:progetto_barcode/data/datasources/api_client.dart';
-import 'package:progetto_barcode/domain/repositories/product_repository.dart';
 import 'package:progetto_barcode/widget/caricaScaricaPage.dart';
 
 class BarcodeScannerPageCarico extends ConsumerStatefulWidget {
-  const BarcodeScannerPageCarico({super.key, required this.IdOrdine, required this.userId, required this.warehouseId, required this.quantitaDiRientro, required this.orderPosition});
-  
+  const BarcodeScannerPageCarico(
+      {super.key,
+      required this.IdOrdine,
+      required this.userId,
+      required this.warehouseId,
+      required this.quantitaDiRientro,
+      required this.orderPosition,
+      required this.orderBarcode});
+
+
   final int IdOrdine;
   final int userId;
   final int warehouseId;
   final int quantitaDiRientro;
   final String orderPosition;
+  final String orderBarcode;
+
   @override
-  _BarcodeScannerPageCaricoState createState() => _BarcodeScannerPageCaricoState();
+  _BarcodeScannerPageCaricoState createState() =>
+      _BarcodeScannerPageCaricoState();
 }
 
-class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCarico> {
+class _BarcodeScannerPageCaricoState
+    extends ConsumerState<BarcodeScannerPageCarico> {
   String? scannedBarcode;
   ProductInfo? productInfo;
   bool isLoading = false;
@@ -45,9 +53,7 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
   }
 
   String? modifyScannedBarcode(String? barcode) {
-    return barcode?.isNotEmpty == true  
-        ? barcode!.padLeft(13, '0')
-        : barcode;
+    return barcode?.isNotEmpty == true ? barcode!.padLeft(13, '0') : barcode;
   }
 
   Future<void> _startBarcodeScan() async {
@@ -96,8 +102,6 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
     final productRepository = ref.read(productRepositoryProvider);
 
     try {
-      // int quantityChange = int.tryParse(_quantityController.text) ?? 0;
-
       await productRepository.updateProductCaricoQuantityOnServer(
         scannedBarcode!,
         widget.quantitaDiRientro,
@@ -105,12 +109,11 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
         widget.userId,
       );
 
-      // Dopo aver aggiornato la quantità sul server, ricarica i dettagli del prodotto
-    await _fetchProductDetails(scannedBarcode!);
- 
+      await _fetchProductDetails(scannedBarcode!);
       _showMessage('Quantità aggiornata con successo');
+
       setState(() {
-        _quantityController.text = '0';  
+        _quantityController.text = '0';
       });
     } catch (e) {
       _showError('Errore durante l\'aggiornamento della quantità: $e');
@@ -132,108 +135,114 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
 
   Widget _buildProductInfo() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (productInfo != null) ...[
-          
-          Text('Nome prodotto: ${productInfo!.Nome}',
-              style: const TextStyle(fontSize: 20)),
-          Text('Quantità attuale: $totalQuantity',
-              style: const TextStyle(fontSize: 24)),
-          Text('Quantità da aggiungere: ${widget.quantitaDiRientro}',
-              style: const TextStyle(fontSize: 24)),
-          Text('Posizione: ${widget.orderPosition}',
-          style: const TextStyle(fontSize: 24)),
-
-          const SizedBox(height: 40),
+          Card(
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text('Nome prodotto: ${productInfo!.Nome}',
+                      style: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text('Quantità attuale: $totalQuantity',
+                      style: const TextStyle(fontSize: 20)),
+                  const SizedBox(height: 8),
+                  Text('Quantità da aggiungere: ${widget.quantitaDiRientro}',
+                      style: const TextStyle(fontSize: 20)),
+                  const SizedBox(height: 8),
+                  Text('Posizione: ${widget.orderPosition}',
+                      style: const TextStyle(fontSize: 20)),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           _buildQuantityInput(),
           const SizedBox(height: 20),
-          // _buildQuantityButtons(),
-          // const SizedBox(height: 30),
-          SizedBox(
-            width: 180,
-            height: 100,
-            child: ElevatedButton(
-              onPressed: _saveQuantity,
-              child: const Text('Salva', style: TextStyle(fontSize: 36)),
-            ),
-          ),
+          _buildSaveButton(),
           const SizedBox(height: 30),
-          SizedBox(
-            width: 180,
-            height: 100,
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  scannedBarcode = null;
-                  productInfo = null;
-                  
-                });
-                   // Poi naviga alla pagina CaricaScaricaPage
-     // Poi naviga alla pagina CaricaScaricaPage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CaricaScaricaPage(
-            warehouseId: widget.warehouseId,
-            userId: widget.userId,
-          ),
-        ),
-      );
-    },
-              child: const Text(
-                'Scansiona un altro prodotto', style: TextStyle(fontSize: 20)),
-             
-            ),
-          ),
+          _buildScanAnotherButton(),
         ],
       ],
     );
   }
 
   Widget _buildQuantityInput() {
-    return SizedBox(
-      width: 200,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TextFormField(
         controller: _quantityController,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
+        style: const TextStyle(fontSize: 20),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           labelText: 'Nuova quantità',
-          labelStyle: TextStyle(fontSize: 30),
+          labelStyle: const TextStyle(fontSize: 24),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
   }
 
-  // Widget _buildQuantityButtons() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       _buildIncrementButton('-', () {
-  //         setState(() {
-  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-  //           _quantityController.text = (currentQuantity - 1).toString();
-  //         });
-  //       }),
-  //       const SizedBox(width: 30),
-  //       _buildIncrementButton('+', () {
-  //         setState(() {
-  //           int currentQuantity = int.tryParse(_quantityController.text) ?? 0;
-  //           _quantityController.text = (currentQuantity + 1).toString();
-  //         });
-  //       }),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildIncrementButton(String label, VoidCallback onPressed) {
+  Widget _buildSaveButton() {
     return SizedBox(
-      width: 120,
-      height: 80,
+      width: 180,
+      height: 60,
       child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(label, style: const TextStyle(fontSize: 36)),
+        onPressed: _saveQuantity,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.all(12),
+          textStyle: const TextStyle(fontSize: 22),
+        ),
+        child: const Text('Salva', style: TextStyle(fontSize: 24)),
+      ),
+    );
+  }
+
+  Widget _buildScanAnotherButton() {
+    return SizedBox(
+      width: 200,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            scannedBarcode = null;
+            productInfo = null;
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CaricaScaricaPage(
+                warehouseId: widget.warehouseId,
+                userId: widget.userId,
+              ),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blueAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.all(12),
+          textStyle: const TextStyle(fontSize: 20),
+        ),
+        child: const Text('Scansiona un altro prodotto'),
       ),
     );
   }
@@ -241,7 +250,15 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Barcode Scanner')), 
+      appBar: AppBar(
+        title: const Text('Scanner di Codici a Barre'),
+        backgroundColor: Colors.blueAccent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(16),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -266,6 +283,6 @@ class _BarcodeScannerPageCaricoState extends ConsumerState<BarcodeScannerPageCar
           ),
         ),
       ),
-    );  
+    );
   }
 }

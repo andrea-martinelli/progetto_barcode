@@ -82,7 +82,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.warehouse, color: Colors.blueGrey), // Icona magazzino
+                    Icon(Icons.warehouse, color: Colors.green
+                    ), // Icona magazzino
                     const SizedBox(width: 8), // Spaziatura tra l'icona e il testo
                     Text(
                       '$reference',
@@ -155,6 +156,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seleziona Magazzino'),
+          centerTitle: true,
+        titleTextStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -183,4 +191,5 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
   }
+
 }
