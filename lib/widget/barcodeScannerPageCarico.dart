@@ -13,8 +13,10 @@ class BarcodeScannerPageCarico extends ConsumerStatefulWidget {
       required this.warehouseId,
       required this.quantitaDiRientro,
       required this.orderPosition,
-      required this.orderBarcode});
-
+      required this.orderBarcode,
+     // required this.IdMateriale
+    });
+      
 
   final int IdOrdine;
   final int userId;
@@ -22,6 +24,7 @@ class BarcodeScannerPageCarico extends ConsumerStatefulWidget {
   final int quantitaDiRientro;
   final String orderPosition;
   final String orderBarcode;
+  //final int IdMateriale;
 
   @override
   _BarcodeScannerPageCaricoState createState() =>
@@ -230,6 +233,7 @@ class _BarcodeScannerPageCaricoState
               builder: (context) => CaricaScaricaPage(
                 warehouseId: widget.warehouseId,
                 userId: widget.userId,
+          
               ),
             ),
           );

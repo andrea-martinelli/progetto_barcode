@@ -51,6 +51,7 @@ class _OrdiniCaricoPage extends ConsumerState<OrdiniCaricoPage> {
       final orderQuantity = ordini['Quantita_DiRientro'];
       final orderPosition = ordini['Posizione'];
       final orderBarcode = ordini['Barcode'];
+      final idMateriale = ordini['IDMateriale'];
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -79,6 +80,7 @@ class _OrdiniCaricoPage extends ConsumerState<OrdiniCaricoPage> {
                     quantitaDiRientro: orderQuantity,
                     orderPosition: orderPosition,
                     orderBarcode: orderBarcode,
+                 //   IdMateriale: idMateriale
                   ),
                 ),
               );
@@ -131,7 +133,6 @@ class _OrdiniCaricoPage extends ConsumerState<OrdiniCaricoPage> {
       );
     }).toList();
   }
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

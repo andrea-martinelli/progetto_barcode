@@ -1,18 +1,3 @@
-// import 'package:progetto_barcode/data/datasources/api_client.dart';
-// import '../../domain/repositories/product_repository.dart';
-
-// class ProductRepositoryImpl implements ProductRepository {
-//   final ApiClient apiClient;
-
-//   ProductRepositoryImpl(this.apiClient);
-
-//    @override
-//   Future<List<Map<String, dynamic>>> fetchGetStock(int Id, String Nome) async {
-//     // Chiama il metodo di ApiClient per ottenere la disponibilità del magazzino
-//     final stockname= await apiClient.fetchGetStock(Id, Nome);
-//     return stockname;
-//   }
-// }
 import 'package:progetto_barcode/data/datasources/api_client.dart';
 import 'package:progetto_barcode/data/models/product_info.dart';
 import 'package:progetto_barcode/data/models/product_info_update.dart';
@@ -76,10 +61,20 @@ class ProductRepositoryImpl implements ProductRepository {
     return ProductInfoUpdate(barcode: barcode, userId: userId, newQuantity: newQuantity, IDOrdine: IDOrdine);
   }
 
+   Future<List<Map<String, dynamic>>> fetchPosizioneMateriali (int idMateriale, int idMagazzino, int userId) async {
+    final posizioneMateriali = await apiClient.fetchPosizioneMateriali(idMateriale, idMagazzino, userId);
+    return posizioneMateriali;
+  }
+  
+  Future<List<Map<String, dynamic>>> fetchPosizioneMaterialiScarico(int idMateriale, int idMagazzino, int userId) async {
+    final posizioneMaterialiScarico = await apiClient.fetchPosizioneMaterialiScarico(idMateriale, idMagazzino, userId);
+    return posizioneMaterialiScarico;
+  }
+
   Future<void> updateMaterialQuantityOnServer(String barcode,int newQuantity, int MaterialId, int UserId)async {
     await apiClient.updateMaterialQuantityOnServer(barcode, newQuantity, MaterialId, UserId);
-  
   }
+
  }
 
 //    // Implementazione del metodo per ottenere gli ordini di un magazzino

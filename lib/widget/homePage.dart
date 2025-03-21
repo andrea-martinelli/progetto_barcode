@@ -43,6 +43,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return stockData.map((stock) {
       final warehouseId = stock['IDMagazzino'];
       final reference = stock['Nome_Magazzino'] ?? 'N/A';
+     
 
       return Card(
         elevation: 6, // Aggiunge ombra alla Card
@@ -60,6 +61,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                 pageBuilder: (context, animation, secondaryAnimation) => CaricaScaricaPage(
                   warehouseId: warehouseId,
                   userId: userId!,
+                 
+                 
+
                 ),
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   const begin = Offset(1.0, 0.0);

@@ -1,41 +1,52 @@
-import 'package:progetto_barcode/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:progetto_barcode/widget/barcodeScannerPageCarico.dart';
+import 'package:progetto_barcode/data/models/product_info.dart';
+import 'package:progetto_barcode/providers.dart';
 import 'package:progetto_barcode/widget/barcodeScannerPageScarico.dart';
 
 class OrdiniScaricoPage extends ConsumerStatefulWidget {
+  OrdiniScaricoPage({
+    required this.warehouseId,
+    required this.userId,
+  });
+
   final int warehouseId; // ID del magazzino selezionato
   final int userId;
 
-  OrdiniScaricoPage({required this.warehouseId, required this.userId});
-
   @override
   _OrdiniScaricoPage createState() => _OrdiniScaricoPage();
-  
 }
 
 class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
+  String? scannedBarcode;
   List<Map<String, dynamic>> orders = [];
   bool isLoading = true;
   String errorMessage = '';
+  ProductInfo? productInfo;
+  int totalQuantity = 0;
 
   @override
   void initState() {
     super.initState();
-    _fetchOrders(widget.warehouseId, ref.read(userIdProvider) ); // Chiamata API per recuperare gli ordini
+    _fetchOrders(widget.warehouseId, widget.userId);
+    _fetchPosizioniPerOrdini(orders);
   }
-   Future<void> _fetchOrders(IdMagazzino, userId) async {
-    try {
-      // Recupera il repository dal provider
-      final repository = ref.read(productRepositoryProvider);
 
-      // Chiama il metodo fetchOrdersByWarehouse con l'ID del magazzino
-      final fetchedOrders = await repository.fetchOrdiniScarica(IdMagazzino, userId);
+
+  Future<void> _fetchOrders(int warehouseId, int userId) async {
+    try {
+      final repository = ref.read(productRepositoryProvider);
+      final fetchedOrders = await repository.fetchOrdiniScarica(warehouseId, userId);
+
+      print('Ordini recuperati: $fetchedOrders'); // Debug per verificare il recupero degli ordini
+
+      // Ora unisci le posizioni a ogni ordine
+      await _fetchPosizioniPerOrdini(fetchedOrders);
 
       setState(() {
         orders = fetchedOrders;
-        isLoading = false;  
+        isLoading = false;
       });
     } catch (e) {
       setState(() {
@@ -46,14 +57,132 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
   }
 
 
+  
+Future<void> _fetchPosizioniPerOrdini(List<Map<String, dynamic>> ordini) async {
+  final repository = ref.read(productRepositoryProvider);
+
+  for (var ordine in ordini) {
+    try {  // Debug: Stampa i dettagli dell'ordine
+      print("Ordine: ${ordine['IDOrdine']}");
+      print("IDMateriale: ${ordine['IdMateriale']}");
+      print("QuantitàTotale: ${ordine['QuantitàTotale']}");
+      print("Posizione: ${ordine['posizione']}");
+
+         final idMateriale = ordine['IdMateriale'];
+          if (idMateriale == null) {
+        print("IDMateriale è null per l'ordine ${ordine['IDOrdine']}");
+        ordine['posizione'] = "Posizione non disponibile";
+        continue; // Salta questo ordine
+      }
+
+
+      // Recupera la posizione dalla seconda chiamata API
+      final posizioneResponse = await repository.fetchPosizioneMaterialiScarico(
+        idMateriale, 
+        widget.warehouseId, 
+        widget.userId
+      );
+
+     // Debug per verificare la risposta
+      print("Posizione risposta per IDMateriale ${ordine['IDMateriale']}: $posizioneResponse");
+
+      // Assicurati che la risposta sia una lista e che non sia vuota
+      if (posizioneResponse is List && posizioneResponse.isNotEmpty) {
+        // Estrai la posizione dal primo elemento della lista
+        final posizione = posizioneResponse[0]['posizione'];
+        ordine['posizione'] = posizione ?? "Posizione non disponibile";
+      } else {
+        // Se la risposta è vuota o non è una lista, metti il valore di fallback
+        ordine['posizione'] = "Posizione non disponibile";
+      }
+    } catch (e) {
+      print("Errore nel recupero della posizione per l'ordine ${ordine['IDOrdine']}: $e");
+      ordine['posizione'] = "Posizione non disponibile"; // Fallback in caso di errore
+    }
+  }
+    print("Ordini con posizioni aggiornate: $ordini");
+
+  // Aggiorna lo stato con gli ordini modificati
+  setState(() {
+    orders = ordini;
+  });
+}
+
+
+
+
+ String? modifyScannedBarcode(String? barcode) {
+    return barcode?.isNotEmpty == true ? barcode!.padLeft(13, '0') : barcode;
+  }
+
+
+
+  Future<void> _startBarcodeScan() async {
+    setState(() => isLoading = true);
+
+    try {
+      print("Inizio scansione barcode...");
+      final result = await BarcodeScanner.scan();
+
+      if (result.rawContent.isNotEmpty) {
+        print("Barcode scansionato: ${result.rawContent}");
+        scannedBarcode = modifyScannedBarcode(result.rawContent);
+
+        final ordini = orders.firstWhere(
+          (m) => m['Barcode'] == scannedBarcode,
+          orElse: () => <String, dynamic>{},
+        );
+
+        if (ordini.isNotEmpty) {
+          print("Ordine trovato, navigazione verso BarcodeScannerPageScarico");
+          ref.read(warehouseIdProvider.notifier).state = widget.warehouseId;
+          
+          print("Posizione passata: ${ordini['Posizione']}");
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BarcodeScannerPageScarico(
+                warehouseId: widget.warehouseId,
+                userId: widget.userId,
+                IdOrdine: ordini['IDOrdine'],
+                quantitaTotale: ordini['QuantitàTotale'],
+                quantitaRichiesta: ordini['Quantita_Richiesta'],
+                barcode: scannedBarcode!,
+               // posizione: ordini['posizione'],
+                materialiId: int.tryParse(ordini['IdMateriale'].toString()) ?? 0,
+              ),
+            ),
+          );
+        } else {
+          print("Ordine non trovato per il barcode scansionato.");
+        }
+      } else {
+        print("Scansione fallita o barcode vuoto.");
+      }
+    } catch (e) {
+      _showError('Errore durante la scansione: $e');
+      print("Errore durante la scansione: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+  void _showError(String message) {
+    setState(() => errorMessage = message);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   List<Widget> _buildOrderList() {
+   
     return orders.map((ordini) {
       final orderId = ordini['IDOrdine'];
       final orderName = ordini['Nome_Materiale'];
-      final orderQuantityRequest = ordini['Quantita_Richiesta'];// da dover cambiare
+      final orderQuantityRequest = ordini['Quantita_Richiesta'];
       final orderQuantityTotal = ordini['QuantitàTotale'];
-      final orderPosition = ordini['Posizione'];
+     // final orderPosition = ordini['posizione'];
       final orderBarcode = ordini['Barcode'];
+      final orderIdMateriale = ordini['idMateriale'];
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -62,14 +191,13 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.all(16.0),
-              backgroundColor: Colors.blueGrey[800], // Colore di sfondo
+              backgroundColor: Colors.blueGrey[800],
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // Bottone arrotondato
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              elevation: 6, // Aggiungi ombra per un effetto moderno
+              elevation: 6,
             ),
             onPressed: () {
-              // Aggiorna il warehouseId nel provider
               ref.read(warehouseIdProvider.notifier).state = widget.warehouseId;
 
               Navigator.push(
@@ -80,8 +208,10 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
                     userId: widget.userId,
                     IdOrdine: orderId,
                     quantitaTotale: orderQuantityTotal,
-                    orderPosition: orderPosition,
                     quantitaRichiesta: orderQuantityRequest,
+                    barcode: orderBarcode,
+                  //  posizione: orderPosition ,
+                    materialiId: orderIdMateriale,
                   ),
                 ),
               );
@@ -91,45 +221,51 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
               children: [
                 Text(
                   'ID Ordine: $orderId',
-                  style:const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white, // Colore del testo bianco
+                    color: Colors.white,
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Nome prodotto: $orderName',
-                  style:const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white70, // Colore del testo più chiaro
+                    color: Colors.white70,
                   ),
                 ),
                 Text(
                   'Quantità Richiesta: $orderQuantityRequest',
-                  style:const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                 ),
                 Text(
                   'Quantità Totale: $orderQuantityTotal',
-                  style:const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                 ),
-                SizedBox(height: 4),
+                // Text(
+                //   'Posizione: $orderPosition',
+                //   style: TextStyle(
+                //     fontSize: 16,
+                //     color: Colors.white70,
+                //   ),
+                //),
                 Text(
                   'Barcode: $orderBarcode',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                 ),
                 Text(
-                  'Posizione: $orderPosition',
-                  style:const TextStyle(
+                  'ID Materiale: $orderIdMateriale',
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
@@ -148,84 +284,32 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
       appBar: AppBar(
         title: const Text('Seleziona ordine di scarico'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : errorMessage.isNotEmpty
-                  ? Text(errorMessage)
-                  : SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: _buildOrderList(),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: isLoading
+                ? const CircularProgressIndicator()
+                : errorMessage.isNotEmpty
+                    ? Text(errorMessage)
+                    : Column(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _startBarcodeScan,
+                            icon: const Icon(Icons.camera_alt),
+                            label: const Text('Scansiona Barcode'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white70,
+                              padding: const EdgeInsets.all(16.0),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          ..._buildOrderList(),
+                        ],
                       ),
-                    ),
+          ),
         ),
       ),
     );
   }
-
-
-
-  //  @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Ordini Magazzino ${widget.warehouseId}'),
-  //     ),
-  //     body: isLoading
-  //         ? Center(child: CircularProgressIndicator())
-  //         : errorMessage.isNotEmpty
-  //             ? Center(child: Text(errorMessage))
-  //             : ListView.builder(
-  //                 itemCount: orders.length,
-  //                 itemBuilder: (context, index) {
-  //                   final order = orders[index];
-
-  //                   return Padding(
-  //                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-  //                     child: ElevatedButton(
-  //                       style: ElevatedButton.styleFrom(
-  //                         minimumSize: Size(double.infinity, 60), // Larghezza completa e altezza fissa
-  //                       ),
-  //                       onPressed: () {
-  //                         // Naviga alla pagina di scansione con l'ID dell'ordine
-  //                         Navigator.push(
-  //                           context,
-  //                           MaterialPageRoute(
-  //                             builder: (context) => BarcodeScannerPage(
-  //                               warehouseId: widget.warehouseId,
-  //                               IdOrdine: order['IDOrdine'], 
-  //                               userId: order['userID'],
-  //                             )   
-  //                           ),
-  //                         );
-  //                       },
-  //                       child: Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children: [
-  //                           Text(
-  //                             'ID Ordine: ${order['IDOrdine']}',
-  //                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //                           ),
-  //                           SizedBox(height: 4), // Spazio tra ID e Prodotto
-  //                           Text(
-  //                             'Nome prodotto: ${order['Nome_Materiale']} - Quantita_Richiesta: ${order['Quantita_Richiesta']}',
-  //                             style: TextStyle(fontSize: 16),
-  //                           ),
-  //                           Text(
-  //                             'Posizione: ${order['Posizione']}',
-  //                             style: TextStyle(fontSize: 16),
-  //                           ),
-  //                           SizedBox(height: 4), // Spazio tra prodotto/quantità e stato
-                            
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   );
-  //                 },
-  //               ),
-  //   );
-  // }
 }
