@@ -30,19 +30,20 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
   void initState() {
     super.initState();
     _fetchOrders(widget.warehouseId, widget.userId);
-    _fetchPosizioniPerOrdini(orders);
+    // _fetchPosizioniPerOrdini(orders);
   }
-
 
   Future<void> _fetchOrders(int warehouseId, int userId) async {
     try {
       final repository = ref.read(productRepositoryProvider);
-      final fetchedOrders = await repository.fetchOrdiniScarica(warehouseId, userId);
+      final fetchedOrders =
+          await repository.fetchOrdiniScarica(warehouseId, userId);
 
-      print('Ordini recuperati: $fetchedOrders'); // Debug per verificare il recupero degli ordini
+      print(
+          'Ordini recuperati: $fetchedOrders'); // Debug per verificare il recupero degli ordini
 
       // Ora unisci le posizioni a ogni ordine
-      await _fetchPosizioniPerOrdini(fetchedOrders);
+      //   await _fetchPosizioniPerOrdini(fetchedOrders);
 
       setState(() {
         orders = fetchedOrders;
@@ -56,117 +57,104 @@ class _OrdiniScaricoPage extends ConsumerState<OrdiniScaricoPage> {
     }
   }
 
+// Future<void> _fetchPosizioniPerOrdini(List<Map<String, dynamic>> ordini) async {
+//   final repository = ref.read(productRepositoryProvider);
 
-  
-Future<void> _fetchPosizioniPerOrdini(List<Map<String, dynamic>> ordini) async {
-  final repository = ref.read(productRepositoryProvider);
+//   for (var ordine in ordini) {
+//     try {  // Debug: Stampa i dettagli dell'ordine
+//       print("Ordine: ${ordine['IDOrdine']}");
+//       print("IDMateriale: ${ordine['IdMateriale']}");
+//       print("QuantitàTotale: ${ordine['QuantitàTotale']}");
+//       print("Posizione: ${ordine['posizione']}");
 
-  for (var ordine in ordini) {
-    try {  // Debug: Stampa i dettagli dell'ordine
-      print("Ordine: ${ordine['IDOrdine']}");
-      print("IDMateriale: ${ordine['IdMateriale']}");
-      print("QuantitàTotale: ${ordine['QuantitàTotale']}");
-      print("Posizione: ${ordine['posizione']}");
+//          final idMateriale = ordine['IdMateriale'];
+//           if (idMateriale == null) {
+//         print("IDMateriale è null per l'ordine ${ordine['IDOrdine']}");
+//         ordine['posizione'] = "Posizione non disponibile";
+//         continue; // Salta questo ordine
+//       }
 
-         final idMateriale = ordine['IdMateriale'];
-          if (idMateriale == null) {
-        print("IDMateriale è null per l'ordine ${ordine['IDOrdine']}");
-        ordine['posizione'] = "Posizione non disponibile";
-        continue; // Salta questo ordine
-      }
+//       // Recupera la posizione dalla seconda chiamata API
+//       final posizioneResponse = await repository.fetchPosizioneOrdineScarico(
+//         idMateriale,
+//         widget.warehouseId,
+//         widget.userId
+//       );
 
+//      // Debug per verificare la risposta
+//       print("Posizione risposta per IDMateriale ${ordine['IDMateriale']}: $posizioneResponse");
 
-      // Recupera la posizione dalla seconda chiamata API
-      final posizioneResponse = await repository.fetchPosizioneMaterialiScarico(
-        idMateriale, 
-        widget.warehouseId, 
-        widget.userId
-      );
+//       // Assicurati che la risposta sia una lista e che non sia vuota
+//       if (posizioneResponse is List && posizioneResponse.isNotEmpty) {
+//         // Estrai la posizione dal primo elemento della lista
+//         final posizione = posizioneResponse[0]['posizione'];
+//         ordine['posizione'] = posizione ?? "Posizione non disponibile";
+//       } else {
+//         // Se la risposta è vuota o non è una lista, metti il valore di fallback
+//         ordine['posizione'] = "Posizione non disponibile";
+//       }
+//     } catch (e) {
+//       print("Errore nel recupero della posizione per l'ordine ${ordine['IDOrdine']}: $e");
+//       ordine['posizione'] = "Posizione non disponibile"; // Fallback in caso di errore
+//     }
+//   }
+//     print("Ordini con posizioni aggiornate: $ordini");
 
-     // Debug per verificare la risposta
-      print("Posizione risposta per IDMateriale ${ordine['IDMateriale']}: $posizioneResponse");
+//   // Aggiorna lo stato con gli ordini modificati
+//   setState(() {
+//     orders = ordini;
+//   });
+// }
 
-      // Assicurati che la risposta sia una lista e che non sia vuota
-      if (posizioneResponse is List && posizioneResponse.isNotEmpty) {
-        // Estrai la posizione dal primo elemento della lista
-        final posizione = posizioneResponse[0]['posizione'];
-        ordine['posizione'] = posizione ?? "Posizione non disponibile";
-      } else {
-        // Se la risposta è vuota o non è una lista, metti il valore di fallback
-        ordine['posizione'] = "Posizione non disponibile";
-      }
-    } catch (e) {
-      print("Errore nel recupero della posizione per l'ordine ${ordine['IDOrdine']}: $e");
-      ordine['posizione'] = "Posizione non disponibile"; // Fallback in caso di errore
-    }
-  }
-    print("Ordini con posizioni aggiornate: $ordini");
-
-  // Aggiorna lo stato con gli ordini modificati
-  setState(() {
-    orders = ordini;
-  });
-}
-
-
-
-
- String? modifyScannedBarcode(String? barcode) {
+  String? modifyScannedBarcode(String? barcode) {
     return barcode?.isNotEmpty == true ? barcode!.padLeft(13, '0') : barcode;
   }
 
-
-
   Future<void> _startBarcodeScan() async {
-    setState(() => isLoading = true);
+  setState(() => isLoading = true);
 
-    try {
-      print("Inizio scansione barcode...");
-      final result = await BarcodeScanner.scan();
+  try {
+    print("Inizio scansione barcode...");
+    final result = await BarcodeScanner.scan();
 
-      if (result.rawContent.isNotEmpty) {
-        print("Barcode scansionato: ${result.rawContent}");
-        scannedBarcode = modifyScannedBarcode(result.rawContent);
+    if (result.rawContent.isNotEmpty) {
+      print("Barcode scansionato: ${result.rawContent}");
+      scannedBarcode = modifyScannedBarcode(result.rawContent);
 
-        final ordini = orders.firstWhere(
-          (m) => m['Barcode'] == scannedBarcode,
-          orElse: () => <String, dynamic>{},
-        );
+      // Fai una richiesta all'API per ottenere i dettagli dell'ordine
+      final repository = ref.read(productRepositoryProvider);
+      final ordine = await repository.getProductByBarcode(scannedBarcode!);
 
-        if (ordini.isNotEmpty) {
-          print("Ordine trovato, navigazione verso BarcodeScannerPageScarico");
-          ref.read(warehouseIdProvider.notifier).state = widget.warehouseId;
-          
-          print("Posizione passata: ${ordini['Posizione']}");
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BarcodeScannerPageScarico(
-                warehouseId: widget.warehouseId,
-                userId: widget.userId,
-                IdOrdine: ordini['IDOrdine'],
-                quantitaTotale: ordini['QuantitàTotale'],
-                quantitaRichiesta: ordini['Quantita_Richiesta'],
-                barcode: scannedBarcode!,
-               // posizione: ordini['posizione'],
-                materialiId: int.tryParse(ordini['IdMateriale'].toString()) ?? 0,
-              ),
+      // Verifica che ordine non sia null
+      if (ordine != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BarcodeScannerPageScarico(
+              warehouseId: widget.warehouseId,
+              userId: widget.userId,
+              IdOrdine: ordine.Id, // Usa ordine.Id
+              quantitaTotale: ordine.Giacenza, // Usa ordine.Giacenza
+              quantitaRichiesta: ordine.Giacenza, // (Se vuoi la stessa quantità, altrimenti sostituisci con il campo corretto)
+              barcode: scannedBarcode!,
+              materialiId: ordine.Id, // Usa ordine.Id (se corrisponde)
             ),
-          );
-        } else {
-          print("Ordine non trovato per il barcode scansionato.");
-        }
+          ),
+        );
       } else {
-        print("Scansione fallita o barcode vuoto.");
+        print("Ordine non trovato per il barcode scansionato.");
       }
-    } catch (e) {
-      _showError('Errore durante la scansione: $e');
-      print("Errore durante la scansione: $e");
-    } finally {
-      setState(() => isLoading = false);
+    } else {
+      print("Scansione fallita o barcode vuoto.");
     }
+  } catch (e) {
+    _showError('Errore durante la scansione: $e');
+    print("Errore durante la scansione: $e");
+  } finally {
+    setState(() => isLoading = false);
   }
+}
+
   void _showError(String message) {
     setState(() => errorMessage = message);
     ScaffoldMessenger.of(context)
@@ -174,13 +162,12 @@ Future<void> _fetchPosizioniPerOrdini(List<Map<String, dynamic>> ordini) async {
   }
 
   List<Widget> _buildOrderList() {
-   
     return orders.map((ordini) {
       final orderId = ordini['IDOrdine'];
       final orderName = ordini['Nome_Materiale'];
       final orderQuantityRequest = ordini['Quantita_Richiesta'];
       final orderQuantityTotal = ordini['QuantitàTotale'];
-     // final orderPosition = ordini['posizione'];
+      // final orderPosition = ordini['posizione'];
       final orderBarcode = ordini['Barcode'];
       final orderIdMateriale = ordini['idMateriale'];
 
@@ -210,7 +197,7 @@ Future<void> _fetchPosizioniPerOrdini(List<Map<String, dynamic>> ordini) async {
                     quantitaTotale: orderQuantityTotal,
                     quantitaRichiesta: orderQuantityRequest,
                     barcode: orderBarcode,
-                  //  posizione: orderPosition ,
+                    //  posizione: orderPosition ,
                     materialiId: orderIdMateriale,
                   ),
                 ),

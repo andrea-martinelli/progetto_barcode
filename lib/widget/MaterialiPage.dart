@@ -18,8 +18,7 @@ class _MaterialiPage extends ConsumerState<MaterialiPage> {
   List<Map<String, dynamic>> materials = [];
   bool isLoading = true;
   String errorMessage = '';
-  String scannedBarcode =
-      ''; // Variabile per memorizzare il risultato del barcode scansionato
+  String scannedBarcode = ''; // Variabile per memorizzare il risultato del barcode scansionato
 
   @override
   void initState() {
@@ -28,6 +27,7 @@ class _MaterialiPage extends ConsumerState<MaterialiPage> {
         ref.read(userIdProvider)); // Chiamata API per recuperare gli ordini
   }
 
+//funzione per recuperare i materiali dal database
   Future<void> _fetchMateriali(IdMagazzino, userId) async {
     try {
       // Recupera il repository dal provider

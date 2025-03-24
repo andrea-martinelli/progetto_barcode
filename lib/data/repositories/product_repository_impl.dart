@@ -66,8 +66,8 @@ class ProductRepositoryImpl implements ProductRepository {
     return posizioneMateriali;
   }
   
-  Future<List<Map<String, dynamic>>> fetchPosizioneMaterialiScarico(int idMateriale, int idMagazzino, int userId) async {
-    final posizioneMaterialiScarico = await apiClient.fetchPosizioneMaterialiScarico(idMateriale, idMagazzino, userId);
+  Future<List<Map<String, dynamic>>> fetchPosizioneOrdineScarico(int idMateriale, int idMagazzino, int userId) async {
+    final posizioneMaterialiScarico = await apiClient.fetchPosizioneOrdineScarico(idMateriale, idMagazzino, userId);
     return posizioneMaterialiScarico;
   }
 

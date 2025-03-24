@@ -22,7 +22,7 @@ abstract class ProductRepository {
 
    Future<List<Map<String, dynamic>>> fetchPosizioneMateriali (int idMateriale, int idMagazzino, int userId);
 
-   Future<List<Map<String, dynamic>>> fetchPosizioneMaterialiScarico(int idMateriale, int idMagazzino, int userId);
+   Future<List<Map<String, dynamic>>> fetchPosizioneOrdineScarico(int idMateriale, int idMagazzino, int userId);
 
     Future<void> updateMaterialQuantityOnServer(String barcode,int newQuantity, int MaterialId, int UserId);
 

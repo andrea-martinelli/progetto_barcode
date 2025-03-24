@@ -56,35 +56,42 @@ class _BarcodeScannerPageScaricoState
     //posizioni = [widget.posizione];
     // Ottieni i dettagli del prodotto appena la pagina viene inizializzata
     _fetchProductDetails(widget.barcode);
-   // _fetchPosizioniPerOrdini();
+   //  _fetchMaterialOrdiniScarico();
+   _fetchPosizioniPerOrdini();
   }
 
-  // Future<void> _fetchPosizioniPerOrdini() async {
-  //   setState(() => isLoading = true);
+  Future<void> _fetchPosizioniPerOrdini() async {
+    setState(() => isLoading = true);
+    
 
-  //   try {
-  //     final repository = ref.read(productRepositoryProvider);
+    try {
+      final repository = ref.read(productRepositoryProvider);
 
-  //     final posizioneResponse = await repository.fetchPosizioneMaterialiScarico(
-  //         widget.materialiId, widget.warehouseId, widget.userId);
+      final posizioneResponse = await repository.fetchPosizioneOrdineScarico(
+          widget.materialiId, widget.warehouseId, widget.userId);
 
-  //     final List<String> extractedPositions = posizioneResponse
-  //         .map<String>((position) => position['posizione'] as String)
-  //         .toList();
+             print("Risposta dell'API per le posizioni: $posizioneResponse"); // Aggiungi questo per il debug
+          
 
-  //     ref.read(materialpositionProvider.notifier).state = extractedPositions;
+      final List<String> extractedPositions = posizioneResponse
+          .map<String>((position) => position['posizione'] as String)
+          .toList();
 
-  //     setState(() {
-  //       selectedPosizione =
-  //           extractedPositions.isNotEmpty ? extractedPositions.first : null;
-  //     });
-  //   } catch (e) {
-  //     print("Errore nel recupero delle posizioni: $e");
-  //   } finally {
-  //     setState(() => isLoading = false);
-  //   }
-  // }
-// print("Errore nel recupero della posizione per l'ordine ${ordine['IDOrdine']}: $e");
+           print("Posizioni ricevute: $extractedPositions");
+
+      ref.read(orderpositionProvder.notifier).state = extractedPositions;
+
+      setState(() {
+        selectedPosizione =
+            extractedPositions.isNotEmpty ? extractedPositions.first : null;
+      });
+    } catch (e) {
+      print("Errore nel recupero delle posizioni: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
 
   //  print("Ordini con posizioni aggiornate: $ordini");
 
@@ -93,32 +100,41 @@ class _BarcodeScannerPageScaricoState
 
 
   // Metodo per ottenere le posizioni del materiale dall'API
-  Future<void> _fetchMaterialOrdiniScarico() async {
-    setState(() => isLoading = true);
+  // Future<void> _fetchMaterialOrdiniScarico() async {
+  //   setState(() => isLoading = true);
 
-    try {
-      final repository = ref.read(productRepositoryProvider);
-      final positions = await repository.fetchPosizioneMaterialiScarico(
-          widget.materialiId, widget.warehouseId, widget.userId);
+  //   try {
+  //     final repository = ref.read(productRepositoryProvider);
+  //     final positions = await repository.fetchPosizioneOrdineScarico(
+  //         widget.materialiId, widget.warehouseId, widget.userId);
+          
+  //     print("Posizioni ricevute: $positions");
 
-      final List<String> extractedPositions = positions
-          .map<String>((position) => position['posizione'] as String)
-          .toList();
+  //     final List<String> extractedPositions = positions
+  //         .map<String>((position) {
+  //            print("Posizione estratta: ${position['posizione']}");
+  //           return position['posizione'] as String;
+  //           })
+  //         .toList();
 
-      // Aggiorna il provider con le posizioni ricevute dall'API
-      ref.read(materialpositionProvider.notifier).state = extractedPositions;
+  //     // Aggiorna il provider con le posizioni ricevute dall'API
+  //     ref.watch(materialpositionProvider.notifier).state = extractedPositions;
+  //     print("Provider popolato con: $extractedPositions");
 
-      setState(() {
-        selectedPosizione =
-            extractedPositions.isNotEmpty ? extractedPositions.first : null;
-      });
-    } catch (e) {
-      _showError('Errore durante il recupero delle posizioni: $e');
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
 
+  //     setState(() {
+  //       selectedPosizione =
+  //           extractedPositions.isNotEmpty ? extractedPositions.first : null;
+  //     });
+  //   } catch (e) {
+  //     _showError('Errore durante il recupero delle posizioni: $e');
+  //   } finally {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
+
+
+// funzione per otteneree il prodotto in base al barcode 
   Future<void> _fetchProductDetails(String barcode) async {
     try {
       setState(() => isLoading = true);
@@ -220,15 +236,22 @@ class _BarcodeScannerPageScaricoState
 
   // Widget per il menu a tendina per la selezione della posizione
   Widget _buildPosizioneDropdown() {
+      final positions = ref.watch(orderpositionProvder); // Leggi dal provider
+
+        if (positions.isEmpty) {
+    return const Center(child: Text('Nessuna posizione disponibile'));
+  }
+
+
     return DropdownButtonFormField<String>(
-      value: selectedPosizione,
-      items: ref.watch(materialpositionProvider).map<DropdownMenuItem<String>>(
-        (String posizione) {
-          return DropdownMenuItem<String>(
-            value: 'posizione',
-            child: Text(posizione),
-          );
-        },
+         value: selectedPosizione,
+    items: positions.map<DropdownMenuItem<String>>(
+      (String posizione) {
+        return DropdownMenuItem<String>(
+          value: posizione,
+          child: Text(posizione),
+        );
+      },
       ).toList(),
       decoration: InputDecoration(
         labelText: 'Seleziona una posizione',

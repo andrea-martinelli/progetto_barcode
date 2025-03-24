@@ -11,7 +11,7 @@ class ApiClient {
 
   // Metodo di login (chiamata reale)
   Future<Map<String, dynamic>> login(String username, String password) async {
-    final url = 'http://192.168.1.99:5158/api/Login/login';
+    final url = 'http://192.168.3.64:5158/api/Login/login';
 
     try {
       final response = await dio.post(
@@ -49,7 +49,7 @@ class ApiClient {
   }
 
   Future<List<Map<String, dynamic>>> fetchGetStock() async {
-    final url = 'http://192.168.1.99:5158/api/Magazzino/GetMagazzino';
+    final url = 'http://192.168.3.64:5158/api/Magazzino/GetMagazzino';
 
     try {
       final response = await dio.get(
@@ -78,7 +78,7 @@ class ApiClient {
   Future<List<Map<String, dynamic>>> fetchOrdiniCarica(
       int idMagazzino, int userId) async {
     final url = //'https://bc7a-151-53-251-220.ngrok-free.app/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
-        'http://192.168.1.99:5158/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
+        'http://192.168.3.64:5158/api/Ordini/GetOrdiniPerMagazzinoCarico?idMagazzino=$idMagazzino&userId=$userId';
 
     try {
       final response = await dio.get(url, options: Options());
@@ -105,7 +105,7 @@ class ApiClient {
   Future<List<Map<String, dynamic>>> fetchOrdiniScarica(
       int IdMagazzino, int userId) async {
     final url = //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
-        'http://192.168.1.99:5158/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
+        'http://192.168.3.64:5158/api/Ordini/GetOrdiniPerMagazzinoScarico?idMagazzino=$IdMagazzino&userId=$userId';
 
     try {
       final response = await dio.get(url, options: Options());
@@ -133,7 +133,7 @@ class ApiClient {
   Future<List<Map<String, dynamic>>> fetchMateriali(
       int IdMagazzino, int userId) async {
     final url =
-        'http://192.168.1.99:5158/api/Materiali/GetMateriali?idMagazzino=$IdMagazzino&userId=$userId';
+        'http://192.168.3.64:5158/api/Materiali/GetMateriali?idMagazzino=$IdMagazzino&userId=$userId';
 
     try {
       final response = await dio.get(url, options: Options());
@@ -159,7 +159,7 @@ class ApiClient {
 
   Future<Map<String, dynamic>> getProductByBarcode(String barcode) async {
     final url = //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
-        'http://192.168.1.99:5158/api/Barcode/$barcode';
+        'http://192.168.3.64:5158/api/Barcode/$barcode';
 
     try {
       print('Invio richiesta a: $url'); // Log dell'URL
@@ -180,7 +180,7 @@ class ApiClient {
       String barcode, int newQuantity, int IDOrdine, int UserID) async {
     // URL pulito
     final url =
-        'http://192.168.1.99:5158/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
+        'http://192.168.3.64:5158/api/Barcode/Carico/$barcode/$newQuantity/$IDOrdine/$UserID';
     // 'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
 
     try {
@@ -222,7 +222,7 @@ class ApiClient {
       String barcode, int newQuantity, int IDOrdine, int UserID) async {
     // URL pulito
     final url =
-        'http://192.168.1.99:5158/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
+        'http://192.168.3.64:5158/api/Barcode/Scarico/$barcode/$newQuantity/$IDOrdine/$UserID';
     //'https://92e3-151-50-131-245.ngrok-free.app/swagger/index.html';
 
     try {
@@ -260,7 +260,7 @@ class ApiClient {
   }
 
   Future<List<Map<String, dynamic>>> fetchPosizioneMateriali(int idMateriale, int idMagazzino, int userId) async {
-    final url ='http://192.168.1.99:5158/api/Materiali/GetPosizioneMateriali?idMateriale=$idMateriale&idMagazzino=$idMagazzino&userId=$userId';
+    final url ='http://192.168.3.64:5158/api/Materiali/GetPosizioneMateriali?idMateriale=$idMateriale&idMagazzino=$idMagazzino&userId=$userId';
     try {
       final response = await dio.get(url);
       if (response.statusCode == 200) {
@@ -273,8 +273,8 @@ class ApiClient {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchPosizioneMaterialiScarico(int idMateriale, int idMagazzino, int userId) async {
-    final url ='http://192.168.1.99:5158/api/Materiali/GetPosizioneOrdini?idMateriale=$idMateriale&idMagazzino=$idMagazzino&userId=$userId';
+  Future<List<Map<String, dynamic>>> fetchPosizioneOrdineScarico(int idMateriale, int idMagazzino, int userId) async {
+    final url ='http://192.168.3.64:5158/api/Ordini/GetPosizioneOrdini?idMateriale=$idMateriale&idMagazzino=$idMagazzino&userId=$userId';
     try {
       final response = await dio.get(url);
       if (response.statusCode == 200) {
@@ -290,7 +290,7 @@ class ApiClient {
   Future<void> updateMaterialQuantityOnServer(
       String barcode, int newQuantity, int MaterialId, int UserId) async {
     final url =
-        'http://192.168.1.99:5158/api/Materiali/Scarico/$barcode/$newQuantity/$MaterialId/$UserId';
+        'http://192.168.3.64:5158/api/Materiali/Scarico/$barcode/$newQuantity/$MaterialId/$UserId';
 
     try {
       final response = await dio.put(

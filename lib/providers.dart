@@ -19,6 +19,8 @@ final userIdProvider = StateProvider<int?>((ref) => null);
 
 final materialpositionProvider = StateProvider<List<String>>((ref) => []);
 
+final orderpositionProvder = StateProvider<List<String>>((ref) => []);
+
 //
 // Define a StateProvider for storing the reference
 //final warehousereferenceProvider = StateProvider<String?>((ref) => null);
